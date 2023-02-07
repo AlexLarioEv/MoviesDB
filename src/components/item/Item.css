@@ -1,0 +1,48 @@
+.list__item{
+    width: 450px;
+    height: 280px;
+}
+.item {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+.item__wrapper{
+    width: 183px;
+    height: 281px;
+}
+.item__description{
+
+}
+.item__image {
+    box-sizing: content-box;
+    width: 100%;
+}
+.item__title{
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+}
+.item__date{
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 22px;
+}
+.item__geners{
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+}
+.item__text{
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 22px;
+}
