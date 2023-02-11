@@ -26,6 +26,7 @@
     "plugins": ["react", "prettier", "import","@typescript-eslint"],
     "rules": {
       "indent": ["error", 2, { "SwitchCase": 1 }],
+      "no-underscore-dangle": ["off", { "allowAfterThis": true }],
       "prettier/prettier": "error",
       "linebreak-style": [0, "unix"],
       "quotes": ["error", "single"],
