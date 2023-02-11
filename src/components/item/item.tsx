@@ -10,7 +10,7 @@ import './Item.css'
 class Item extends Component<Omit<Parameter, 'id'>, any> {
   cropText(text: string, len: number) {
     const newLen = text.indexOf(' ', len)
-    return text.length > len ? `${text.slice(0, len)}...` : text
+    return text.length > newLen ? `${text.slice(0, newLen)}...` : text
   }
 
   render() {
