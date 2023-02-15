@@ -4,6 +4,13 @@ export interface Parameters {
   title: Array<string>
   overview: Array<string>
   releaseDate: Array<string>
+  loading: boolean
+  error: boolean
+  errorText: string
+  labelSearch: string
+  totalResults: number
+  pages: Array<string>
+  page: number
 }
 export interface Parameter {
   posterPath: string
@@ -11,7 +18,7 @@ export interface Parameter {
   title: string
   overview: string
   releaseDate: string
-}
-export interface State {
-  data: Array<Parameters>
+  loading: boolean
+  error: boolean
+  errorText: string
 }
