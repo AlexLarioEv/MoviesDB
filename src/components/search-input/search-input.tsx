@@ -7,6 +7,8 @@ import './search-input.css'
 interface Props {
   updateMovies: (arg0: string) => void
   clearData: () => void
+  changeLabel: (label: string) => void
+  loading: boolean
 }
 
 interface State {
@@ -19,14 +21,21 @@ class SearchInput extends Component<Props, State> {
   }
 
   onChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    this.setState({ label: e.target.value })
-    // this.props.clearData()
+    this.props.clearData()
+    this.setState(() => {
+      return { label: e.target.value, loading: true }
+    })
+    this.props.changeLabel(e.target.value)
   }
 
+  // componentWillUnmount(): void {
+  // }
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>): void {
     if (prevState !== this.state) {
       this.props.updateMovies(this.state.label)
     }
+    // console.log(1)
+    // console.log(prevState, this.state)
   }
 
   render() {

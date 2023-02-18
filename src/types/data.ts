@@ -11,6 +11,7 @@ export interface Parameters {
   totalResults: number
   pages: Array<string>
   page: number
+  network: boolean
 }
 export interface Parameter {
   posterPath: string

@@ -9,33 +9,9 @@ import 'antd/dist/reset.css'
 import './list.css'
 
 class List extends Component<
-  Omit<Parameters, 'labelSearch' | 'totalResults' | 'pages'>,
+  Omit<Parameters, 'labelSearch' | 'totalResults' | 'pages' | 'network'>,
   Pick<Parameters, 'id' | 'title' | 'overview' | 'posterPath' | 'releaseDate'>
 > {
-  // state = {
-  //   id: this.props.id,
-  //   title: this.props.title,
-  //   overview: this.props.overview,
-  //   posterPath: this.props.posterPath,
-  //   releaseDate: this.props.releaseDate,
-  // }
-
-  // componentDidUpdate(
-  //   prevProps: Readonly<Omit<Parameters, 'labelSearch' | 'totalResults' | 'pages'>>,
-  //   prevState: Readonly<Pick<Parameters, 'posterPath' | 'id' | 'title' | 'overview' | 'releaseDate'>>,
-  //   snapshot?: any
-  // ): void {
-  //   if (prevState === this.state) {
-  //     this.setState({
-  //       id: [...this.state.id, ...this.props.id],
-  //       title: [...this.state.title, ...this.props.title],
-  //       overview: [...this.state.overview, ...this.props.overview],
-  //       posterPath: [...this.state.posterPath, ...this.props.posterPath],
-  //       releaseDate: [...this.state.releaseDate, ...this.props.releaseDate],
-  //     })
-  //   }
-  // }
-
   render() {
     const { id, title, posterPath, overview, releaseDate, loading, error, errorText, page } = this.props
 
