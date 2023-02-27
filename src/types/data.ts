@@ -12,6 +12,7 @@ export interface Parameters {
   pages: Array<string>
   page: number
   network: boolean
+  counter: number
 }
 export interface Parameter {
   posterPath: string

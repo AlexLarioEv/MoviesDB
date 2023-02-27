@@ -13,18 +13,17 @@ interface Props {
 class PaginationApp extends Component<Props, object> {
   render() {
     const { totalResults, onChangePage, loading, error } = this.props
-    const paggination =
-      loading || error ? null : (
-        <Pagination
-          onChange={onChangePage}
-          className={totalResults === 0 ? 'pagination--none' : 'pagination'}
-          defaultCurrent={1}
-          total={totalResults}
-          disabled={totalResults === 0}
-          pageSizeOptions={[6]}
-          defaultPageSize={6}
-        />
-      )
+    const paggination = error ? null : (
+      <Pagination
+        onChange={onChangePage}
+        className={totalResults === 0 ? 'pagination--none' : 'pagination'}
+        defaultCurrent={1}
+        total={totalResults}
+        disabled={totalResults === 0}
+        pageSizeOptions={[6]}
+        defaultPageSize={6}
+      />
+    )
     return paggination
   }
 }
