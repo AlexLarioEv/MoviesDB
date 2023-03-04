@@ -28,20 +28,14 @@ class SearchInput extends Component<Props, State> {
     this.props.changeLabel(e.target.value)
   }
 
-  // componentWillUnmount(): void {
-  // }
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>): void {
     if (prevState !== this.state) {
       this.props.updateMovies(this.state.label)
     }
-    // console.log(1)
-    // console.log(prevState, this.state)
   }
 
   render() {
-    return (
-      <Input onChange={debaunce(this.onChange, 1000)} className="input" size="large" placeholder="Type to search..." />
-    )
+    return <Input onChange={debaunce(this.onChange, 1000)} className="input" size="large" placeholder="Type to search..." />
   }
 }
 
