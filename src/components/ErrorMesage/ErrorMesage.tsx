@@ -2,8 +2,8 @@ import React from 'react'
 import { Alert } from 'antd'
 
 import 'antd/dist/reset.css'
-import './error.css'
-import { Parameter } from '../../types/data'
+import './Error.css'
+import { Parameter } from '../../Types/Data'
 
 const ErrorMessage: React.FC<Pick<Parameter, 'errorText'>> = (props) => {
   const { errorText } = props

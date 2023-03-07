@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 export default class MoviesServies {
   _apiBase = 'https://api.themoviedb.org/3/search/movie?api_key=23e61b7bfe0f2cab339fe6edd888f615&language=en-US&page='
 
@@ -34,7 +33,9 @@ export default class MoviesServies {
   }
 
   async getGuestSessionsRate(guestSessionId: string, page: string) {
-    const res = await fetch(`https://api.themoviedb.org/3/guest_session/${guestSessionId}/rated/movies?api_key=23e61b7bfe0f2cab339fe6edd888f615&page=${page}&language=en-US&sort_by=created_at.asc`)
+    const res = await fetch(
+      `https://api.themoviedb.org/3/guest_session/${guestSessionId}/rated/movies?api_key=23e61b7bfe0f2cab339fe6edd888f615&page=${page}&language=en-US&sort_by=created_at.asc`
+    )
     if (!res.ok) {
       throw new Error(`Could not fetch ganre, received ${res.status}`)
     }

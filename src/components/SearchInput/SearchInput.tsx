@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Input } from 'antd'
 import debaunce from 'lodash.debounce'
 
-import './search-input.css'
+import './SearchInput.css'
 
 interface Props {
   updateMovies: (arg0: string) => void
@@ -21,11 +21,13 @@ class SearchInput extends Component<Props, State> {
   }
 
   onChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    this.props.clearData()
-    this.setState(() => {
-      return { label: e.target.value, loading: true }
-    })
-    this.props.changeLabel(e.target.value)
+    if (e.target.value.match(/\S/)) {
+      this.props.clearData()
+      this.setState(() => {
+        return { label: e.target.value, loading: true }
+      })
+      this.props.changeLabel(e.target.value)
+    }
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>): void {

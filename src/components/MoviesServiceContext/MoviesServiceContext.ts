@@ -1,6 +1,6 @@
 import React from 'react'
 
-import MoviesServies from '../../services/movies-servies'
+import MoviesServies from '../../Services/MoviesServies'
 
 const moviesServies = new MoviesServies()
 

@@ -1,13 +1,11 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 
-import MoviesServies from '../../services/movies-servies'
-import SearchInput from '../search-input/search-input'
-import List from '../list/list'
-import PaginationApp from '../pagination/pagination'
-import { Parameters, DataFilmsServer, DataFilmServer, DataFilm } from '../../types/data'
-import { MoviesServicetProvider } from '../movies-service-context/movies-service-context'
+import MoviesServies from '../../Services/MoviesServies'
+import List from '../List/List'
+import PaginationApp from '../Pagination/Pagination'
+import { Parameters, DataFilm, DataFilmServer, DataFilmsServer } from '../../Types/Data'
 
-class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<Parameters, 'network' | 'sendRateMovie'>> {
+class RatedContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<Parameters, 'network' | 'sendRateMovie' | 'labelSearch'>> {
   moviesServies = new MoviesServies()
 
   state = {
@@ -23,19 +21,18 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
     },
     idGuestSession: this.props.idGuestSession,
     loading: false,
-    labelSearch: '',
     totalResults: 0,
-    pages: ['1', '2', '3'],
     page: 1,
     pageSize: 6,
+    pages: ['1', '2', '3'],
     error: false,
     errorText: '',
   }
 
-  updateMovies = (leabel: string) => {
+  updateRateMovies = () => {
     Promise.all(
       this.state.pages.map((page: string) => {
-        return this.moviesServies.getResource(leabel, page)
+        return this.moviesServies.getGuestSessionsRate(this.state.idGuestSession, page)
       })
     )
       .then(this.onMoviesLoaded)
@@ -44,21 +41,21 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
 
   onMoviesLoaded = (dataMovies: Array<DataFilmsServer>) => {
     if (dataMovies[0].total_results !== 0) {
-      this.updateDataFilm(dataMovies)
+      this.updateDataRate(dataMovies)
     } else {
       this.setState({
         error: true,
-        errorText: `Search did not return results for the query ${this.state.labelSearch}`,
+        errorText: 'Please rate the movie',
         loading: false,
       })
     }
   }
 
-  updateDataFilm(dataMovies: Array<DataFilmsServer>) {
-    const totalResults = dataMovies[0].total_results
+  updateDataRate = (dataMoviesRate: Array<DataFilmsServer>) => {
+    const totalResults = dataMoviesRate[0].total_results
     this.setState(({ dataFilm, pages }) => {
       const allMovies = []
-      allMovies.push(dataMovies.map((arr: DataFilmsServer) => arr.results))
+      allMovies.push(dataMoviesRate.map((arr: DataFilmsServer) => arr.results))
       const movies: Array<DataFilmServer> = allMovies.flat(2)
       return {
         dataFilm: {
@@ -66,10 +63,10 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
           title: this.updatePropertyDate(movies, dataFilm, pages, totalResults, 'title', 'title'),
           overview: this.updatePropertyDate(movies, dataFilm, pages, totalResults, 'overview', 'overview'),
           releaseDate: this.updatePropertyDate(movies, dataFilm, pages, totalResults, 'releaseDate', 'release_date'),
+          rating: this.updatePropertyDate(movies, dataFilm, pages, totalResults, 'rating', 'rating'),
           posterPath: this.updatePropertyDate(movies, dataFilm, pages, totalResults, 'posterPath', 'poster_path'),
           genreIds: this.updatePropertyDate(movies, dataFilm, pages, totalResults, 'genreIds', 'genre_ids'),
           voteAverage: this.updatePropertyDate(movies, dataFilm, pages, totalResults, 'voteAverage', 'vote_average'),
-          rating: [],
         },
         loading: false,
         totalResults,
@@ -103,8 +100,6 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
     this.setState({
       dataFilm: { id: [], posterPath: [], title: [], overview: [], releaseDate: [], genreIds: [], voteAverage: [], rating: [] },
       loading: true,
-      page: 1,
-      pages: ['1', '2', '3'],
     })
   }
 
@@ -122,50 +117,51 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
     })
   }
 
-  changeLabel = (label: string) => {
-    this.setState(() => {
-      return { labelSearch: label }
-    })
-  }
-
   sendRateMovie = (movieId: string, value: number) => {
     const objValue = {
       value,
     }
-    this.moviesServies.getMoviesRate(movieId, String(this.props.idGuestSession), objValue)
+    this.moviesServies.getMoviesRate(movieId, String(this.state.idGuestSession), objValue)
+    this.updateRateMovies()
   }
 
   componentDidUpdate(prevProps: object, prevState: Readonly<Parameters>): void {
     if (prevState.pages !== this.state.pages) {
-      this.updateMovies(this.state.labelSearch)
+      this.updateRateMovies()
     }
   }
 
-  render() {
+  componentDidMount(): void {
+    this.updateRateMovies()
+  }
+
+  componentWillUnmount(): void {
+    this.clearData()
+  }
+
+  render(): React.ReactNode {
     return (
-      <MoviesServicetProvider value={this.moviesServies}>
-        <div>
-          <SearchInput
-            updateMovies={this.updateMovies}
-            clearData={this.clearData}
-            changeLabel={this.changeLabel}
-            loading={this.state.loading}
-          ></SearchInput>
-          <List
-            dataFilm={this.state.dataFilm}
-            loading={this.state.loading}
-            error={this.state.error}
-            errorText={this.state.errorText}
-            page={this.state.page}
-            pageSize={this.state.pageSize}
-            idGuestSession={this.state.idGuestSession}
-            sendRateMovie={this.sendRateMovie}
-          ></List>
-          <PaginationApp totalResults={this.state.totalResults} onChangePage={this.onChangePage} error={this.state.error} page={this.state.page} />
-        </div>
-      </MoviesServicetProvider>
+      <Fragment>
+        <List
+          dataFilm={this.state.dataFilm}
+          loading={this.state.loading}
+          error={this.state.error}
+          errorText={this.state.errorText}
+          page={this.state.page}
+          pageSize={this.state.pageSize}
+          idGuestSession={this.state.idGuestSession}
+          sendRateMovie={this.sendRateMovie}
+        ></List>
+        <PaginationApp
+          pageSize={this.state.pageSize}
+          totalResults={this.state.totalResults}
+          onChangePage={this.onChangePage}
+          error={this.state.error}
+          page={this.state.page}
+        />
+      </Fragment>
     )
   }
 }
 
-export default SearchContent
+export default RatedContent
