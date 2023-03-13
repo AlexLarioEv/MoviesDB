@@ -27,7 +27,7 @@ export default class MoviesServies {
   async getCreateGuestSessions() {
     const res = await fetch(' https://api.themoviedb.org/3/authentication/guest_session/new?api_key=23e61b7bfe0f2cab339fe6edd888f615')
     if (!res.ok) {
-      throw new Error(`Could not fetch ganre, received ${res.status}`)
+      throw new Error(`Could not fetch create guest sessions, received ${res.status}`)
     }
     return res.json()
   }
@@ -37,7 +37,7 @@ export default class MoviesServies {
       `https://api.themoviedb.org/3/guest_session/${guestSessionId}/rated/movies?api_key=23e61b7bfe0f2cab339fe6edd888f615&page=${page}&language=en-US&sort_by=created_at.asc`
     )
     if (!res.ok) {
-      throw new Error(`Could not fetch ganre, received ${res.status}`)
+      throw new Error(`Could not fetch guest sessions rate, received ${res.status}`)
     }
     return res.json()
   }
@@ -49,7 +49,7 @@ export default class MoviesServies {
       body: JSON.stringify(value),
     })
     if (!res.ok) {
-      throw new Error(`Could not fetch ganre, received ${res.status}`)
+      throw new Error(`Could not fetch movies rate, received ${res.status}`)
     }
     return res.json()
   }
