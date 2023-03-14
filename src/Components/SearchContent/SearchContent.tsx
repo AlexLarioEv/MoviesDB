@@ -36,9 +36,21 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
     const p1 = this.state.pages.map((page: string) => {
       return this.moviesServies.getResource(leabel, page)
     })
-    const p2 = this.state.pages.map((page: string) => {
-      return this.moviesServies.getGuestSessionsRate(this.state.idGuestSession, page)
+    Promise.all([...p1])
+      .then(this.onMoviesLoaded)
+      .catch(this.onError)
+  }
+
+  updateMoviesRate = (leabel: string) => {
+    const p1 = this.state.pages.map((page: string) => {
+      return this.moviesServies.getResource(leabel, page)
     })
+    let p2: Promise<DataFilmsServer>[] = []
+    if (this.state.idGuestSession !== '') {
+      p2 = ['1', '2', '3'].map((page: string) => {
+        return this.moviesServies.getGuestSessionsRate(this.state.idGuestSession, page)
+      })
+    }
     Promise.all([...p1, ...p2])
       .then(this.onMoviesLoaded)
       .catch(this.onError)
@@ -46,8 +58,9 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
 
   onMoviesLoaded = (dataMovies: Array<DataFilmsServer>) => {
     if (dataMovies[0].total_results !== 0) {
-      this.updateDataFilm(dataMovies)
-      console.log(dataMovies)
+      const dataMovie = dataMovies.slice(0, this.state.pages.length)
+      const dataRate = dataMovies.slice(this.state.pages.length, dataMovies.length)
+      this.updateDataFilm(dataMovie, dataRate)
     } else {
       this.setState({
         error: true,
@@ -57,24 +70,11 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
     }
   }
 
-  onRateLoaded = (dataRate: Array<DataFilmsServer>) => {
-    this.updateRateFilm(dataRate)
-  }
-
-  updateRateMovies = () => {
-    Promise.all(
-      this.state.pages.map((page: string) => {
-        return this.moviesServies.getGuestSessionsRate(this.state.idGuestSession, page)
-      })
-    ).then(this.onRateLoaded)
-  }
-
-  updateDataFilm(dataMovies: Array<DataFilmsServer>) {
-    const totalResults = dataMovies[0].total_results
+  updateDataFilm(dataMovie: Array<DataFilmsServer>, dataRate: Array<DataFilmsServer> = []) {
+    const totalResults = dataMovie[0].total_results
     this.setState(({ dataFilm, pages }) => {
-      const allMovies = []
-      allMovies.push(dataMovies.map((arr: DataFilmsServer) => arr.results))
-      const movies: Array<DataFilmServer> = allMovies.flat(2)
+      const movies = this.formDataServer(dataMovie)
+      const rates = this.formDataServer(dataRate)
       return {
         dataFilm: {
           id: this.updatePropertyDate(movies, dataFilm, pages, totalResults, 'id', 'id'),
@@ -84,7 +84,7 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
           posterPath: this.updatePropertyDate(movies, dataFilm, pages, totalResults, 'posterPath', 'poster_path'),
           genreIds: this.updatePropertyDate(movies, dataFilm, pages, totalResults, 'genreIds', 'genre_ids'),
           voteAverage: this.updatePropertyDate(movies, dataFilm, pages, totalResults, 'voteAverage', 'vote_average'),
-          rating: dataFilm.rating,
+          rating: this.updateRatingData(rates, movies, dataFilm, pages, totalResults),
         },
         loading: false,
         totalResults,
@@ -93,31 +93,10 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
     })
   }
 
-  updateRateFilm = (dataRate: Array<DataFilmsServer>) => {
-    const totalResults = dataRate[0].total_results
-    this.setState(({ dataFilm, pages }) => {
-      const allMovies = []
-      allMovies.push(dataRate.map((arr: DataFilmsServer) => arr.results))
-      const rate: Array<DataFilmServer> = allMovies.flat(2)
-      let newRating = Array(60)
-      rate.forEach((el) => {
-        const ids = dataFilm.id.indexOf(el.id)
-        newRating = [...newRating.slice(0, ids), el.rating, ...newRating.slice(ids, 59)]
-      })
-      return {
-        dataFilm: {
-          id: dataFilm.id,
-          title: dataFilm.title,
-          overview: dataFilm.overview,
-          releaseDate: dataFilm.releaseDate,
-          posterPath: dataFilm.posterPath,
-          genreIds: dataFilm.genreIds,
-          voteAverage: dataFilm.voteAverage,
-          rating: newRating,
-        },
-      }
-    })
-    console.log(this.state)
+  formDataServer(dataType: Array<DataFilmsServer>) {
+    const allMovies = []
+    allMovies.push(dataType.map((arr: DataFilmsServer) => arr.results))
+    return allMovies.flat(2)
   }
 
   updatePropertyDate(
@@ -135,6 +114,23 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
     let newProp = Array(totalResults)
     newProp = [...prop.slice(0, leftIndex), ...movies.map((item: DataFilmServer) => item[propNameData]), ...prop.slice(rightIndex, totalResults)]
     return newProp
+  }
+
+  updateRatingData(ratings: Array<DataFilmServer>, movies: Array<DataFilmServer>, dataFilm: DataFilm, pages: Array<string>, totalResults: number) {
+    const { rating } = dataFilm
+    const leftIndex = (Number(pages[0]) - 1) * 20
+    const rightIndex = Number(pages[2]) * 20
+    rating.length = totalResults
+    let newRating = Array(60)
+    ratings.forEach((rateElement) => {
+      movies.forEach((movieElement, index) => {
+        const ids = movieElement.id === rateElement.id ? index : -1
+        if (ids >= 0) {
+          newRating = [...newRating.slice(0, ids), rateElement.rating, ...newRating.slice(ids + 1, totalResults)]
+        }
+      })
+    })
+    return [...rating.slice(0, leftIndex), ...newRating, ...rating.slice(rightIndex, totalResults)]
   }
 
   onError = (err: Error) => {
@@ -182,14 +178,12 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
       this.setState({ idGuestSession: this.props.idGuestSession })
     }
     if (prevState.pages !== this.state.pages) {
-      // eslint-disable-next-line @typescript-eslint/no-implied-eval
-      // setTimeout(() => this.updateRateMovies(), 1000)
-      this.updateMovies(this.state.labelSearch)
+      this.updateMoviesRate(this.state.labelSearch)
     }
   }
 
   componentDidMount(): void {
-    this.updateMovies(this.state.labelSearch)
+    this.updateMoviesRate(this.state.labelSearch)
   }
 
   render() {
@@ -197,7 +191,7 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
       <MoviesServicetProvider value={this.moviesServies}>
         <div>
           <SearchInput
-            updateMovies={this.updateMovies}
+            updateMoviesRate={this.updateMoviesRate}
             clearData={this.clearData}
             changeLabel={this.changeLabel}
             loading={this.state.loading}

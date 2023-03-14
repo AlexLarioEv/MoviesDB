@@ -5,7 +5,7 @@ import debaunce from 'lodash.debounce'
 import './SearchInput.css'
 
 interface Props {
-  updateMovies: (arg0: string) => void
+  updateMoviesRate: (arg0: string) => void
   clearData: () => void
   changeLabel: (label: string) => void
   loading: boolean
@@ -32,7 +32,7 @@ class SearchInput extends Component<Props, State> {
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>): void {
     if (prevState !== this.state) {
-      this.props.updateMovies(this.state.label)
+      this.props.updateMoviesRate(this.state.label)
     }
   }
 
