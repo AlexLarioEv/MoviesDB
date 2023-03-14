@@ -32,15 +32,6 @@ class SearchContent extends Component<Pick<Parameters, 'idGuestSession'>, Omit<P
     errorText: '',
   }
 
-  updateMovies = (leabel: string) => {
-    const p1 = this.state.pages.map((page: string) => {
-      return this.moviesServies.getResource(leabel, page)
-    })
-    Promise.all([...p1])
-      .then(this.onMoviesLoaded)
-      .catch(this.onError)
-  }
-
   updateMoviesRate = (leabel: string) => {
     const p1 = this.state.pages.map((page: string) => {
       return this.moviesServies.getResource(leabel, page)
